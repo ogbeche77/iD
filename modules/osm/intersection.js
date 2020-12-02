@@ -164,10 +164,10 @@ export function osmIntersection(graph, startVertexId, maxDistance) {
         // actions can be replayed on the main graph exactly in the same order.
         // (It is unintuitive, but the order of ways returned from graph.parentWays()
         // is arbitrary, depending on how the main graph and vgraph were built)
-        var splitAll = actionSplit(v.id);
+        var splitAll = actionSplit([v.id]).keepHistoryOn('first');
         if (!splitAll.disabled(vgraph)) {
             splitAll.ways(vgraph).forEach(function(way) {
-                var splitOne = actionSplit(v.id).limitWays([way.id]);
+                var splitOne = actionSplit([v.id]).limitWays([way.id]).keepHistoryOn('first');
                 actions.push(splitOne);
                 vgraph = splitOne(vgraph);
             });
@@ -380,7 +380,7 @@ export function osmIntersection(graph, startVertexId, maxDistance) {
                     if (currPath.indexOf(way.id) !== -1 && currPath.length >= 3) continue;
 
                     // Check all "current" restrictions (where we've already walked the `FROM`)
-                    var restrict = undefined;
+                    var restrict = null;
                     for (j = 0; j < currRestrictions.length; j++) {
                         var restriction = currRestrictions[j];
                         var f = restriction.memberByRole('from');
@@ -441,8 +441,7 @@ export function osmIntersection(graph, startVertexId, maxDistance) {
                         }
 
                         // stop looking if we find a "direct" restriction (matching FROM, VIA, TO)
-                        if (restrict && restrict.direct)
-                            break;
+                        if (restrict && restrict.direct) break;
                     }
 
                     nextWays.push({ way: way, restrict: restrict });
@@ -607,19 +606,25 @@ export function osmInferRestriction(graph, turn, projection) {
     var angle = (geoAngle(fromVertex, fromNode, projection) -
                 geoAngle(toVertex, toNode, projection)) * 180 / Math.PI;
 
-    while (angle < 0)
+    while (angle < 0) {
         angle += 360;
+    }
 
-    if (fromNode === toNode)
+    if (fromNode === toNode) {
         return 'no_u_turn';
-    if ((angle < 23 || angle > 336) && fromOneWay && toOneWay)
+    }
+    if ((angle < 23 || angle > 336) && fromOneWay && toOneWay) {
         return 'no_u_turn';   // wider tolerance for u-turn if both ways are oneway
-    if ((angle < 40 || angle > 319) && fromOneWay && toOneWay && turn.from.vertex !== turn.to.vertex)
+    }
+    if ((angle < 40 || angle > 319) && fromOneWay && toOneWay && turn.from.vertex !== turn.to.vertex) {
         return 'no_u_turn';   // even wider tolerance for u-turn if there is a via way (from !== to)
-    if (angle < 158)
+    }
+    if (angle < 158) {
         return 'no_right_turn';
-    if (angle > 202)
+    }
+    if (angle > 202) {
         return 'no_left_turn';
+    }
 
     return 'no_straight_on';
 }

@@ -1,5 +1,4 @@
 import {
-    event as d3_event,
     select as d3_select
 } from 'd3-selection';
 
@@ -10,7 +9,7 @@ export function utilKeybinding(namespace) {
     var _keybindings = {};
 
 
-    function testBindings(isCapturing) {
+    function testBindings(d3_event, isCapturing) {
         var didMatch = false;
         var bindings = Object.keys(_keybindings).map(function(id) { return _keybindings[id]; });
         var i, binding;
@@ -25,25 +24,30 @@ export function utilKeybinding(namespace) {
             binding = bindings[i];
             if (!binding.event.modifiers.shiftKey) continue;  // no shift
             if (!!binding.capture !== isCapturing) continue;
-            if (matches(binding, true)) {
-                binding.callback();
+            if (matches(d3_event, binding, true)) {
+                binding.callback(d3_event);
                 didMatch = true;
+
+                // match a max of one binding per event
+                break;
             }
         }
 
-        // then unshifted keybindings
         if (didMatch) return;
+
+        // then unshifted keybindings
         for (i = 0; i < bindings.length; i++) {
             binding = bindings[i];
             if (binding.event.modifiers.shiftKey) continue;   // shift
             if (!!binding.capture !== isCapturing) continue;
-            if (matches(binding, false)) {
-                binding.callback();
+            if (matches(d3_event, binding, false)) {
+                binding.callback(d3_event);
+                break;
             }
         }
 
 
-        function matches(binding, testShift) {
+        function matches(d3_event, binding, testShift) {
             var event = d3_event;
             var isMatch = false;
             var tryKeyCode = true;
@@ -56,11 +60,15 @@ export function utilKeybinding(namespace) {
                 if (binding.event.key === undefined) {
                     isMatch = false;
                 } else if (Array.isArray(binding.event.key)) {
-                    if (binding.event.key.map(function(s) { return s.toLowerCase(); }).indexOf(event.key.toLowerCase()) === -1)
+                    if (binding.event.key.map(function(s) {
+                        return s.toLowerCase();
+                    }).indexOf(event.key.toLowerCase()) === -1) {
                         isMatch = false;
+                    }
                 } else {
-                    if (event.key.toLowerCase() !== binding.event.key.toLowerCase())
+                    if (event.key.toLowerCase() !== binding.event.key.toLowerCase()) {
                         isMatch = false;
+                    }
                 }
             }
 
@@ -86,17 +94,17 @@ export function utilKeybinding(namespace) {
     }
 
 
-    function capture() {
-        testBindings(true);
+    function capture(d3_event) {
+        testBindings(d3_event, true);
     }
 
 
-    function bubble() {
+    function bubble(d3_event) {
         var tagName = d3_select(d3_event.target).node().tagName;
         if (tagName === 'INPUT' || tagName === 'SELECT' || tagName === 'TEXTAREA') {
             return;
         }
-        testBindings(false);
+        testBindings(d3_event, false);
     }
 
 
@@ -214,13 +222,16 @@ utilKeybinding.modifierProperties = {
     91: 'metaKey'
 };
 
+utilKeybinding.plusKeys = ['plus', 'ffplus', '=', 'ffequals', '≠', '±'];
+utilKeybinding.minusKeys = ['_', '-', 'ffminus', 'dash', '–', '—'];
+
 utilKeybinding.keys = {
     // Backspace key, on Mac: ⌫ (Backspace)
     '⌫': 'Backspace', backspace: 'Backspace',
     // Tab Key, on Mac: ⇥ (Tab), on Windows ⇥⇥
     '⇥': 'Tab', '⇆': 'Tab', tab: 'Tab',
     // Return key, ↩
-    '↩': 'Enter', 'return': 'Enter', enter: 'Enter', '⌅': 'Enter',
+    '↩': 'Enter', '↵': 'Enter', '⏎': 'Enter', 'return': 'Enter', enter: 'Enter', '⌅': 'Enter',
     // Pause/Break key
     'pause': 'Pause', 'pause-break': 'Pause',
     // Caps Lock key, ⇪
@@ -321,7 +332,7 @@ utilKeybinding.keyCodes = {
     // Tab Key, on Mac: ⇥ (Tab), on Windows ⇥⇥
     '⇥': 9, '⇆': 9, tab: 9,
     // Return key, ↩
-    '↩': 13, 'return': 13, enter: 13, '⌅': 13,
+    '↩': 13, '↵': 13, '⏎': 13, 'return': 13, enter: 13, '⌅': 13,
     // Pause/Break key
     'pause': 19, 'pause-break': 19,
     // Caps Lock key, ⇪

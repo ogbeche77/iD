@@ -1,6 +1,6 @@
 import * as countryCoder from '@ideditor/country-coder';
 import { dispatch as d3_dispatch } from 'd3-dispatch';
-import { event as d3_event, select as d3_select } from 'd3-selection';
+import { select as d3_select } from 'd3-selection';
 
 import { t, localizer } from '../core/localizer';
 import { svgIcon } from '../svg/icon';
@@ -30,7 +30,7 @@ export function uiField(context, presetField, entityIDs, options) {
 
     var _locked = false;
     var _lockedTip = uiTooltip()
-        .title(t('inspector.lock.suggestion', { label: field.label }))
+        .title(t.html('inspector.lock.suggestion', { label: field.label }))
         .placement('bottom');
 
 
@@ -86,7 +86,7 @@ export function uiField(context, presetField, entityIDs, options) {
     }
 
 
-    function revert(d) {
+    function revert(d3_event, d) {
         d3_event.stopPropagation();
         d3_event.preventDefault();
         if (!entityIDs || _locked) return;
@@ -95,7 +95,7 @@ export function uiField(context, presetField, entityIDs, options) {
     }
 
 
-    function remove(d) {
+    function remove(d3_event, d) {
         d3_event.stopPropagation();
         d3_event.preventDefault();
         if (_locked) return;
@@ -132,7 +132,7 @@ export function uiField(context, presetField, entityIDs, options) {
             textEnter
                 .append('span')
                 .attr('class', 'label-textvalue')
-                .text(function(d) { return d.label(); });
+                .html(function(d) { return d.label(); });
 
             textEnter
                 .append('span')
@@ -143,7 +143,6 @@ export function uiField(context, presetField, entityIDs, options) {
                     .append('button')
                     .attr('class', 'remove-icon')
                     .attr('title', t('icons.remove'))
-                    .attr('tabindex', -1)
                     .call(svgIcon('#iD-operation-delete'));
             }
 
@@ -152,7 +151,6 @@ export function uiField(context, presetField, entityIDs, options) {
                     .append('button')
                     .attr('class', 'modified-icon')
                     .attr('title', t('icons.undo'))
-                    .attr('tabindex', -1)
                     .call(svgIcon((localizer.textDirection() === 'rtl') ? '#iD-icon-redo' : '#iD-icon-undo'));
             }
         }
@@ -185,7 +183,7 @@ export function uiField(context, presetField, entityIDs, options) {
 
                 // instantiate tag reference
                 if (options.wrap && options.info) {
-                    var referenceKey = d.key;
+                    var referenceKey = d.key || '';
                     if (d.type === 'multiCombo') {   // lookup key without the trailing ':'
                         referenceKey = referenceKey.replace(/:$/, '');
                     }

@@ -1,7 +1,6 @@
 import _debounce from 'lodash-es/debounce';
 
 import {
-    event as d3_event,
     select as d3_select
 } from 'd3-selection';
 
@@ -15,7 +14,7 @@ export function uiToolUndoRedo(context) {
 
     var tool = {
         id: 'undo_redo',
-        label: t('toolbar.undo_redo')
+        label: t.html('toolbar.undo_redo')
     };
 
     var commands = [{
@@ -51,8 +50,8 @@ export function uiToolUndoRedo(context) {
             .placement('bottom')
             .title(function (d) {
                 return d.annotation() ?
-                    t(d.id + '.tooltip', { action: d.annotation() }) :
-                    t(d.id + '.nothing');
+                    t.html(d.id + '.tooltip', { action: d.annotation() }) :
+                    t.html(d.id + '.nothing');
             })
             .keys(function(d) {
                 return [d.cmd];
@@ -66,11 +65,11 @@ export function uiToolUndoRedo(context) {
             .enter()
             .append('button')
             .attr('class', function(d) { return 'disabled ' + d.id + '-button bar-button'; })
-            .on('pointerup', function() {
+            .on('pointerup', function(d3_event) {
                 // `pointerup` is always called before `click`
                 lastPointerUpType = d3_event.pointerType;
             })
-            .on('click', function(d) {
+            .on('click', function(d3_event, d) {
                 d3_event.preventDefault();
 
                 var annotation = d.annotation();
@@ -92,7 +91,7 @@ export function uiToolUndoRedo(context) {
                         .duration(2000)
                         .iconName('#' + d.icon)
                         .iconClass(annotation ? '' : 'disabled')
-                        .text(text)();
+                        .label(text)();
                 }
                 lastPointerUpType = null;
             })
@@ -104,11 +103,11 @@ export function uiToolUndoRedo(context) {
         });
 
         context.keybinding()
-            .on(commands[0].cmd, function() {
+            .on(commands[0].cmd, function(d3_event) {
                 d3_event.preventDefault();
                 if (editable()) commands[0].action();
             })
-            .on(commands[1].cmd, function() {
+            .on(commands[1].cmd, function(d3_event) {
                 d3_event.preventDefault();
                 if (editable()) commands[1].action();
             });

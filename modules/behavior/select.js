@@ -1,4 +1,4 @@
-import { event as d3_event, select as d3_select } from 'd3-selection';
+import { select as d3_select } from 'd3-selection';
 
 import { geoVecLength } from '../geo';
 import { modeBrowse } from '../modes/browse';
@@ -24,7 +24,7 @@ export function behaviorSelect(context) {
     var _pointerPrefix = 'PointerEvent' in window ? 'pointer' : 'mouse';
 
 
-    function keydown() {
+    function keydown(d3_event) {
 
         if (d3_event.keyCode === 32) {
             // don't react to spacebar events during text input
@@ -61,7 +61,7 @@ export function behaviorSelect(context) {
     }
 
 
-    function keyup() {
+    function keyup(d3_event) {
         cancelLongPress();
 
         if (!d3_event.shiftKey) {
@@ -72,7 +72,7 @@ export function behaviorSelect(context) {
         if (d3_event.keyCode === 93) {  // context menu key
             d3_event.preventDefault();
             _lastInteractionType = 'menukey';
-            contextmenu();
+            contextmenu(d3_event);
         } else if (d3_event.keyCode === 32) {  // spacebar
             var pointer = _downPointers.spacebar;
             if (pointer) {
@@ -88,7 +88,7 @@ export function behaviorSelect(context) {
     }
 
 
-    function pointerdown() {
+    function pointerdown(d3_event) {
         var id = (d3_event.pointerId || 'mouse').toString();
 
         cancelLongPress();
@@ -124,7 +124,7 @@ export function behaviorSelect(context) {
     }
 
 
-    function pointermove() {
+    function pointermove(d3_event) {
         var id = (d3_event.pointerId || 'mouse').toString();
         if (_downPointers[id]) {
             _downPointers[id].lastEvent = d3_event;
@@ -138,7 +138,7 @@ export function behaviorSelect(context) {
     }
 
 
-    function pointerup() {
+    function pointerup(d3_event) {
         var id = (d3_event.pointerId || 'mouse').toString();
         var pointer = _downPointers[id];
         if (!pointer) return;
@@ -155,7 +155,7 @@ export function behaviorSelect(context) {
     }
 
 
-    function pointercancel() {
+    function pointercancel(d3_event) {
         var id = (d3_event.pointerId || 'mouse').toString();
         if (!_downPointers[id]) return;
 
@@ -167,13 +167,12 @@ export function behaviorSelect(context) {
     }
 
 
-    function contextmenu() {
-        var e = d3_event;
-        e.preventDefault();
+    function contextmenu(d3_event) {
+        d3_event.preventDefault();
 
-        if (!+e.clientX && !+e.clientY) {
+        if (!+d3_event.clientX && !+d3_event.clientY) {
             if (_lastMouseEvent) {
-                e.sourceEvent = _lastMouseEvent;
+                d3_event.sourceEvent = _lastMouseEvent;
             } else {
                 return;
             }
@@ -226,7 +225,7 @@ export function behaviorSelect(context) {
         // support multiselect if data is already selected
         var isMultiselect = context.mode().id === 'select' && (
             // and shift key is down
-            (d3_event && d3_event.shiftKey) ||
+            (lastEvent && lastEvent.shiftKey) ||
             // or we're lasso-selecting
             context.surface().select('.lasso').node() ||
             // or a pointer is down over a selected feature
@@ -257,11 +256,13 @@ export function behaviorSelect(context) {
 
                 var datum = pointerInfo.firstEvent.target.__data__;
                 var entity = (datum && datum.properties && datum.properties.entity) || datum;
-                if (context.graph().hasEntity(entity.id)) return {
-                    pointerId: pointerId,
-                    entityId: entity.id,
-                    selected: selectedIDs.indexOf(entity.id) !== -1
-                };
+                if (context.graph().hasEntity(entity.id)) {
+                    return {
+                        pointerId: pointerId,
+                        entityId: entity.id,
+                        selected: selectedIDs.indexOf(entity.id) !== -1
+                    };
+                }
             }
             return null;
         }
@@ -382,7 +383,7 @@ export function behaviorSelect(context) {
             .on(_pointerPrefix + 'move.select', pointermove, true)
             .on(_pointerPrefix + 'up.select', pointerup, true)
             .on('pointercancel.select', pointercancel, true)
-            .on('contextmenu.select-window', function() {
+            .on('contextmenu.select-window', function(d3_event) {
                 // Edge and IE really like to show the contextmenu on the
                 // menubar when user presses a keyboard menu button
                 // even after we've already preventdefaulted the key event.
@@ -396,10 +397,10 @@ export function behaviorSelect(context) {
             .on(_pointerPrefix + 'down.select', pointerdown)
             .on('contextmenu.select', contextmenu);
 
-        if (d3_event && d3_event.shiftKey) {
+        /*if (d3_event && d3_event.shiftKey) {
             context.surface()
                 .classed('behavior-multiselect', true);
-        }
+        }*/
     }
 
 

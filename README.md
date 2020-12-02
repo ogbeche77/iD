@@ -2,10 +2,6 @@
 
 [![Build Status](https://travis-ci.org/openstreetmap/iD.svg?branch=develop)](https://travis-ci.org/openstreetmap/iD)
 
-
-:warning: _We've recently changed our branch names. [`develop`](https://github.com/openstreetmap/iD/tree/develop) is now the default branch, replacing `2.x`. [`v3-prototype`](https://github.com/openstreetmap/iD/tree/v3-prototype) is now the alpha version of iD v3, replacing `master`. [`release`](https://github.com/openstreetmap/iD/tree/release) is still `release`._
-
-
 ## Basics
 
 * iD is a JavaScript [OpenStreetMap](https://www.openstreetmap.org/) editor.
@@ -24,11 +20,11 @@
 if you're looking for something to do.
 * [Translate!](https://github.com/openstreetmap/iD/blob/develop/CONTRIBUTING.md#translating)
 * Test a prerelease version of iD:
-  * Stable mirror of `release` branch:  https://preview.ideditor.com/release
+  * Stable mirror of `release` branch: https://ideditor-release.netlify.app
   * Development mirror of `develop` branch + latest translations: https://ideditor.netlify.com
-  * Development mirror of `v3-prototype` branch:  https://preview.ideditor.com/master
+  * Development mirror of `v3-prototype` branch: https://preview.ideditor.com/master
 
-Come on in, the water's lovely. More help? Ping `bhousel` or `quincylvania` on:
+Come on in, the water's lovely. More help? Ping `quincylvania` or `bhousel` on:
 * [OpenStreetMap US Slack](https://slack.openstreetmap.us/)
 (`#id` or `#general` channels)
 * [OpenStreetMap IRC](https://wiki.openstreetmap.org/wiki/IRC)
@@ -92,7 +88,9 @@ iD also bundles portions of the following open source software.
 * [editor-layer-index (CC-BY-SA 3.0)](https://github.com/osmlab/editor-layer-index)
 * [Font Awesome (CC-BY 4.0)](https://fontawesome.com/license)
 * [Maki (CC0 1.0)](https://github.com/mapbox/maki)
+* [Temaki (CC0 1.0)](https://github.com/ideditor/temaki)
 * [Mapillary JS (MIT)](https://github.com/mapillary/mapillary-js)
+* [iD Tagging Schema (ISC)](https://github.com/openstreetmap/id-tagging-schema)
 * [name-suggestion-index (BSD-3-Clause)](https://github.com/osmlab/name-suggestion-index)
 * [osm-community-index (ISC)](https://github.com/osmlab/osm-community-index)
 

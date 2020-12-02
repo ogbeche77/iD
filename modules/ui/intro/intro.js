@@ -191,17 +191,17 @@ export function uiIntro(context) {
 
     buttons
       .append('span')
-      .text(d => t(d.title));
+      .html(d => t.html(d.title));
 
     buttons
       .append('span')
       .attr('class', 'status')
       .call(svgIcon((localizer.textDirection() === 'rtl' ? '#iD-icon-backward' : '#iD-icon-forward'), 'inline'));
 
-    enterChapter(chapters[0]);
+    enterChapter(null, chapters[0]);
 
 
-    function enterChapter(newChapter) {
+    function enterChapter(d3_event, newChapter) {
       if (_currChapter) { _currChapter.exit(); }
       context.enter(modeBrowse(context));
 
